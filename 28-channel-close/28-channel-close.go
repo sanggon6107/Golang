@@ -7,7 +7,7 @@ import (
 
 var wg sync.WaitGroup
 
-func Recieve(wg *sync.WaitGroup, ch chan int) {
+func Receive(wg *sync.WaitGroup, ch chan int) {
 
 	for i := range ch { // 채널에 값이 들어올 때마다 Println. 만약 Close(ch) 하지 않으면 해당 for문은 ch에 값이 들어올 때까지 무한 반복한다.
 		fmt.Println("i : ", i)
@@ -19,7 +19,7 @@ func main() {
 	ch := make(chan int)
 
 	wg.Add(1)
-	go Recieve(&wg, ch)
+	go Receive(&wg, ch)
 	for i := 0; i < 9; i++ {
 		ch <- i // 채널이 빌때마다 넣는다.
 	}
