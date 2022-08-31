@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 // 채널을 만들면 뮤텍스 없이도 Go routine의 역할을 안전하게 나눌 수 있다.
@@ -22,25 +23,57 @@ type PurchaseOrder struct {
 	window string
 }
 
-func InstallWindow(chIn, chOut chan *Car, purchaseOrder *PurchaseOrder) {
-	fmt.Println("InstallWindow")
-	for data := range chIn {
-		data.window = purchaseOrder.window
-		chOut <- data
+func InstallWindow(chOut chan *Car, wg *sync.WaitGroup, purchaseOrder *PurchaseOrder) {
+	tick := time.Tick(time.Second)
+	after := time.After(time.Second * 10)
+
+	for {
+		select {
+		case <-tick:
+			fmt.Println("InstallWindow")
+			car := &Car{}
+			car.window = purchaseOrder.window
+			chOut <- car
+		case <-after:
+			close(chOut)
+			wg.Done()
+			return
+		}
 	}
 }
 
-func InstallTire(carCh chan *Car, purchaseOrder *PurchaseOrder) {
-	fmt.Println("InstallTire")
+func InstallTire(chIn, chOut chan *Car, wg *sync.WaitGroup, purchaseOrder *PurchaseOrder) {
+	for car := range chIn {
+		fmt.Println("InstallTire")
+		car.tire = purchaseOrder.tire
+		time.Sleep(time.Second)
+		chOut <- car
+	}
+	wg.Done()
+	close(chOut)
 }
 
-func PaintCar(carCh chan *Car, purchaseOrder *PurchaseOrder) {
-	fmt.Println("PaintCar")
+func PaintCar(chIn chan *Car, wg *sync.WaitGroup, purchaseOrder *PurchaseOrder) {
+	for car := range chIn {
+		fmt.Println("PaintCar")
+		car.color = purchaseOrder.color
+		time.Sleep(time.Second)
+
+	}
+	wg.Done()
 }
 
 func main() {
 	var wg sync.WaitGroup
+	wg.Add(3)
+
+	po := &PurchaseOrder{"Blue", "big tire", "small window"}
+	chTire := make(chan *Car)
+	chPaint := make(chan *Car)
+	go InstallWindow(chTire, &wg, po)
+	go InstallTire(chTire, chPaint, &wg, po)
+	go PaintCar(chPaint, &wg, po)
 
 	wg.Wait()
-
+	fmt.Println("close factory")
 }
