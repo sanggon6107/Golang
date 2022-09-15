@@ -16,7 +16,46 @@
 확장에는 열려있고 변경에는 닫혀있어야 한다. 즉, 새로운 기능을 확장할 때 기존의 코드를 변경하는 것을 지양하도록 설계해야 한다. 마찬가지로 전략 패턴과 같이 상속 위주의 패턴보다 구성 위주의 코드를 짜는게 이 원칙을 지키는데 유리하다는 생각이 들었다. 또 1. Single responsibility principle과 밀접한 관계가 있다는 생각이 들었다.
 
 ### **3. Liscov Substitution Principle**
+q(x)를 타입 T의 객체 x에 대해 증명할 수 있는 속성이라고 할 때, 타입 T의 하위 타입 S에 대하여 타입 S 객체 y도 q(y)가 성립하여야 한다. 즉, 어떠한 특정 의도대로 만들어진 함수(일종의 함수 구현자와 호출자의 합의된 계약 성립)가, T의 하위 객체에 대하여도 제대로 이행되어야 한다는 뜻.
 
+```Go
+type T interface {
+    String() string
+}
+
+type S type {
+    firstField int
+}
+
+type SS type {
+    secondField int
+}
+
+func (rec *S) String() string { // 인터페이스 T를 구현
+    return rec.firstField
+}
+
+func (rec *SS) String() string { // 인터페이스 T를 구현
+    return rec.secondField
+}
+
+// q의 구현은, 이 함수의 호출자와 구현자의 합의된 의도에 의해 일종의 "계약"이 발생한다고 볼 수 있다.
+func q(t T) {
+    if _, ok := t.(*SS); ok { // 그런데 T의 하위 객체  t(SS)가 의도된 대로 Println을 이행하지 않고 panic해버린다면 리스코프 치환 법칙을 위반하는 코드이다.
+        panic("Can't be SS")
+    }
+
+    fmt.Println(t.String()) // T를 구현한 모든 타입에 대해 
+}
+
+x := &S{"firstField"}
+y := &SS{"secondField"}
+
+// 모두 T를 구현하였으므로 q(x), q(y)가 잘 동작해야 한다.
+q(x)
+q(y)
+
+```
 
 
 
