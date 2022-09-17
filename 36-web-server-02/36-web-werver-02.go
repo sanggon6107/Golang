@@ -8,7 +8,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 )
 
 // how to parse query parameters
@@ -20,11 +19,9 @@ func IndexPathHandler(w http.ResponseWriter, r *http.Request) {
 		name = "Anonymous"
 	}
 	if age == "" {
-		age = "UnKnown"
+		age = "?"
 	}
-
-	ageInt, _ := strconv.Atoi(age)
-	fmt.Fprintf(w, "Hi %s, who is %d years old! \n", name, ageInt)
+	fmt.Fprintf(w, "Hi %s, who is %s years old! \n", name, age)
 }
 
 type GooHandler struct {
