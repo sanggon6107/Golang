@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial=scale=1.0">
+        <title>file server</title>
+    </head>
+    <body>
+        <p><h1>파일을 전송해보자.</h1></p>
+        <form action="/uploads" method="POST" accept-charset="utf-8" enctype="multipart/form-data"> <!-- action="/uploads"는 액션 시 uploads 경로 불러오라는 뜻. -->
+            <p><input type="file" id="upload_file_id" name="upload_file_name"/></p>
+            <p><input type="submit" name="submit_file"/></p>
+        </form>>
+    </body>
+</html>
