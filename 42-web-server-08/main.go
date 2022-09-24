@@ -12,7 +12,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/sanggon6107/Golang/tree/master/42-web-server-08/myapp"
+	"github.com/sanggon6107/Golang/blob/master/42-web-server-08/myapp"
 )
 
 func main() {

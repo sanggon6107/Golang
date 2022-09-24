@@ -1,4 +1,4 @@
-module github.com/sanggon6107/42-web-server-08/myapp
+module github.com/sanggon6107/Golang/42-web-server-08/myapp
 
 go 1.18
 
