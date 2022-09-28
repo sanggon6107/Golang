@@ -2,7 +2,10 @@ module github.com/sanggon6107/Golang/42-web-server-08/myapp
 
 go 1.18
 
-require github.com/stretchr/testify v1.8.0
+require (
+	github.com/gorilla/mux v1.8.0
+	github.com/stretchr/testify v1.8.0
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
