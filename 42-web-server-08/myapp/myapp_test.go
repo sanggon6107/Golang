@@ -81,3 +81,14 @@ func TestCreateUserHandler(t *testing.T) {
 	assert.Equal(user.FirstName, user2.FirstName)
 	assert.Equal(user.LastName, user2.LastName)
 }
+
+func TestDeleteUserHandler(t *testing.T) {
+	assert := assert.New(t)
+	ts := httptest.NewServer(NewHandler())
+	defer ts.Close()
+
+	req, _ := http.NewRequest("DELETE", ts.URL+"/users/1", nil)
+	resp, err := http.DefaultClient.Do(req)
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+}

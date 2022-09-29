@@ -60,7 +60,7 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	lastUserID++
 	user.ID = lastUserID
-	userMap[user.ID] = user // user is a pointer to User.
+	userMap[user.ID] = user // user is a pointer to User. update userMap.
 
 	user.CreatedAt = time.Now()
 	w.Header().Add("Content-Type", "application/json")
@@ -77,7 +77,7 @@ func NewHandler() http.Handler {
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/users", usersHandler).Methods("GET")
 	mux.HandleFunc("/users", createUserHandler).Methods("POST")
-	mux.HandleFunc("/users/{id:[0-9]+}", getUsersHandler)
+	mux.HandleFunc("/users/{id:[0-9]+}", getUsersHandler).Methods("GET")
 
 	return mux
 }
