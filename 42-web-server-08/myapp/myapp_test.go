@@ -81,13 +81,38 @@ func TestCreateUserHandler(t *testing.T) {
 	assert.Equal(user.LastName, user2.LastName)
 }
 
+// test for "DELETE"
 func TestDeleteUserHandler(t *testing.T) {
 	assert := assert.New(t)
 	ts := httptest.NewServer(NewHandler())
 	defer ts.Close()
 
+	// should be no user to delete
 	req, _ := http.NewRequest("DELETE", ts.URL+"/users/1", nil)
 	resp, err := http.DefaultClient.Do(req)
 	assert.NoError(err)
 	assert.Equal(http.StatusOK, resp.StatusCode)
+	data, _ := ioutil.ReadAll(resp.Body)
+	assert.Contains(string(data), "No user Id:1")
+
+	// POST to make a user
+	resp, err = http.Post(ts.URL+"/users", "application/json",
+		strings.NewReader(`{"first_name":"Salcan", "last_name":"Han"}`))
+	assert.NoError(err)
+	assert.Equal(http.StatusCreated, resp.StatusCode)
+
+	// parsing the response to the above code.
+	user := new(User)
+	err = json.NewDecoder(resp.Body).Decode(user)
+	assert.NoError(err)
+	assert.NotEqual(0, user.ID)
+
+	idStr := strconv.Itoa(user.ID)
+	req, _ = http.NewRequest("DELETE", ts.URL+"/users/"+idStr, nil)
+	resp, err = http.DefaultClient.Do(req)
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+	data, _ = ioutil.ReadAll(resp.Body)
+	assert.Contains(string(data), "User deleted Id:"+idStr)
+
 }

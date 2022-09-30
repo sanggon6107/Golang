@@ -77,14 +77,16 @@ func deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 		return
 	}
+	idStr := strconv.Itoa(id)
 	_, ok := userMap[id]
 	if !ok {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "No user id:"+strconv.Itoa(id))
+		fmt.Fprint(w, "No user Id:"+idStr)
 		return
 	}
 	delete(userMap, id)
 	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, "User deleted Id:"+idStr)
 }
 
 func NewHandler() http.Handler {
