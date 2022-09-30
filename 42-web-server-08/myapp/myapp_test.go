@@ -41,7 +41,6 @@ func TestGetUsersHandler(t *testing.T) {
 	assert := assert.New(t)
 	ts := httptest.NewServer(NewHandler())
 	defer ts.Close()
-
 	// userId := strconv.Itoa(rand.Intn(99))
 	resp, err := http.Get(ts.URL + "/users/99")
 	assert.NoError(err)
