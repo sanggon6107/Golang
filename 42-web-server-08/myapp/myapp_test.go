@@ -36,7 +36,7 @@ func TestUsers(t *testing.T) {
 	assert.Contains(string(data), "Get UserInfo")
 }
 
-// test for "Get"
+// test for "GET"
 func TestGetUsersHandler(t *testing.T) {
 	assert := assert.New(t)
 	ts := httptest.NewServer(NewHandler())
@@ -114,5 +114,27 @@ func TestDeleteUserHandler(t *testing.T) {
 	assert.Equal(http.StatusOK, resp.StatusCode)
 	data, _ = ioutil.ReadAll(resp.Body)
 	assert.Contains(string(data), "User deleted Id:"+idStr)
+}
 
+func TestUpdateUserHandler(t *testing.T) {
+	assert := assert.New(t)
+	ts := httptest.NewServer(NewHandler())
+	defer ts.Close()
+
+	resp, err := http.Post(ts.URL+"/users", "application/json",
+		strings.NewReader(`{"first_name":"Salcan", "last_name":"Han"}`))
+	assert.NoError(err)
+	assert.Equal(http.StatusCreated, resp.StatusCode)
+
+	req, _ := http.NewRequest("PUT", ts.URL+"/users/1",
+		strings.NewReader(`{"ID":1, "first_name":"updated", "last_name":"updated"}`))
+	resp, err = http.DefaultClient.Do(req)
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+
+	userUpdated := new(User)
+	err = json.NewDecoder(resp.Body).Decode(userUpdated)
+	assert.NoError(err)
+	assert.Equal(userUpdated.FirstName, "updated")
+	assert.Equal(userUpdated.LastName, "updated")
 }
