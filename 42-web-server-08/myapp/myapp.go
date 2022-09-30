@@ -119,9 +119,12 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 		return
 	}
-
-	user.FirstName = newUserInfo.FirstName
-	user.LastName = newUserInfo.LastName
+	if newUserInfo.FirstName != "" {
+		user.FirstName = newUserInfo.FirstName
+	}
+	if newUserInfo.LastName != "" {
+		user.LastName = newUserInfo.LastName
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Add("Content-Type", "application/json")

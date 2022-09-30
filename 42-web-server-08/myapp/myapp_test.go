@@ -2,9 +2,13 @@ package myapp
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
+	"fmt"
 	"io/ioutil"
+
+	"github.com/stretchr/testify/assert"
+
 	// "math/rand"
+
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -125,9 +129,14 @@ func TestUpdateUserHandler(t *testing.T) {
 		strings.NewReader(`{"first_name":"Salcan", "last_name":"Han"}`))
 	assert.NoError(err)
 	assert.Equal(http.StatusCreated, resp.StatusCode)
+	userBeforeUpdate := new(User)
+	err = json.NewDecoder(resp.Body).Decode(userBeforeUpdate)
+	assert.NoError(err)
 
-	req, _ := http.NewRequest("PUT", ts.URL+"/users/1",
-		strings.NewReader(`{"ID":1, "first_name":"updated", "last_name":"updated"}`))
+	jsonUpdate := fmt.Sprintf(`{"ID":%d, "first_name":"updated"}`, userBeforeUpdate.ID)
+
+	req, _ := http.NewRequest("PUT", ts.URL+"/users/"+strconv.Itoa(userBeforeUpdate.ID),
+		strings.NewReader(jsonUpdate))
 	resp, err = http.DefaultClient.Do(req)
 	assert.NoError(err)
 	assert.Equal(http.StatusOK, resp.StatusCode)
@@ -136,5 +145,5 @@ func TestUpdateUserHandler(t *testing.T) {
 	err = json.NewDecoder(resp.Body).Decode(userUpdated)
 	assert.NoError(err)
 	assert.Equal(userUpdated.FirstName, "updated")
-	assert.Equal(userUpdated.LastName, "updated")
+	assert.Equal(userUpdated.LastName, "Han")
 }
