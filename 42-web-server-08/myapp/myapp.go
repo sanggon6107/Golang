@@ -21,7 +21,20 @@ var userMap map[int]*User
 var lastUserID int
 
 func usersHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Get UserInfo by /users/{id}")
+	if len(userMap) == 0 {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, "No user")
+		return
+	}
+
+	users := []*User{}
+	for _, u := range userMap {
+		users = append(users, u)
+	}
+	data, _ := json.Marshal(users)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, string(data))
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {

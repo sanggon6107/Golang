@@ -28,7 +28,7 @@ func TestNewHandler(t *testing.T) {
 	assert.Equal("Hello world!", string(data))
 }
 
-func TestUsers(t *testing.T) {
+func TestUserHandler(t *testing.T) {
 	assert := assert.New(t)
 	ts := httptest.NewServer(NewHandler())
 	defer ts.Close()
@@ -37,7 +37,26 @@ func TestUsers(t *testing.T) {
 	assert.NoError(err)
 	assert.Equal(http.StatusOK, resp.StatusCode)
 	data, _ := ioutil.ReadAll(resp.Body) // response
-	assert.Contains(string(data), "Get UserInfo")
+	assert.Equal(string(data), "No user")
+
+	resp, err = http.Post(ts.URL+"/users", "application/json",
+		strings.NewReader(`{"first_name":"Salcan I", "last_name":"Han"}`))
+	assert.NoError(err)
+	assert.Equal(http.StatusCreated, resp.StatusCode)
+
+	resp, err = http.Post(ts.URL+"/users", "application/json",
+		strings.NewReader(`{"first_name":"Salcan II", "last_name":"Han"}`))
+	assert.NoError(err)
+	assert.Equal(http.StatusCreated, resp.StatusCode)
+
+	resp, err = http.Get(ts.URL + "/users")
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+
+	users := []*User{}
+	err = json.NewDecoder(resp.Body).Decode(&users)
+	assert.NoError(err)
+	assert.Equal(2, len(users))
 }
 
 // test for "GET"
